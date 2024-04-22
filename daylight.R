@@ -1,6 +1,7 @@
 library(rvest)
 library(tidyverse)
 
+# Data collection ----
 # Function to scrape and tidy the table for a specific month and year
 scrape_and_tidy_table <- function(month, year, city) {
   # Construct the URL
@@ -123,3 +124,76 @@ save(
   daylight_data,
   file = "data/daylight_data.RData"
 )
+
+
+# Daylength plot ----
+library(tidyverse)
+
+# Daylength plot ----
+daylight_data %>% 
+  filter(
+    city %in% c("denpasar", "linz"),
+    date >= as.Date("2023-01-01"),
+    date <= as.Date("2024-12-31")
+  ) %>% 
+  mutate(
+    city = str_to_title(city)
+  ) %>% 
+  ggplot(aes(x = date, y = day_length)) +
+  geom_point(
+    aes(color = city),
+    size = 3,
+    alpha = .2
+  ) +
+  scale_color_manual(
+    name = "City",
+    values = c("Denpasar" = "#4FA6DC", "Linz" = "#E23092")
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(
+      face = "bold",
+      hjust = .5
+    ),
+    legend.position = "bottom"
+  ) +
+  labs(
+    title = "Comparison of Daylength between Denpasar and Linz",
+    x = "Date",
+    y = "Daylength (hours)"
+  )
+
+# Sunset plot ----
+daylight_data %>% 
+  filter(
+    city %in% c("denpasar", "linz"),
+    date >= as.Date("2023-01-01"),
+    date <= as.Date("2024-12-31")
+  ) %>% 
+  mutate(
+    city = str_to_title(city),
+    sunset_time = as.numeric(hm(sunset_time)) / 3600
+  ) %>% 
+  ggplot(aes(x = date, y = day_length)) +
+  geom_point(
+    aes(color = city),
+    size = 3,
+    alpha = .3
+  ) +
+  scale_color_manual(
+    name = "City",
+    values = c("Denpasar" = "#4FA6DC", "Linz" = "#E23092")
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(
+      face = "bold",
+      hjust = .5
+    ),
+    legend.position = "bottom"
+  ) +
+  labs(
+    title = "Comparison of Daylength between Denpasar and Linz",
+    x = "Date",
+    y = "Daylength (hours)"
+  )
