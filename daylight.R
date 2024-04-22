@@ -54,17 +54,19 @@ all_data <- list()
 
 # Iterate over years, months, and cities
 cities <- c(
-  "austria/linz",
-  "australia/perth",
-  "france/paris",
-  "indonesia/denpasar",
-  "japan/tokyo",
-  "kenya/nairobi",
-  "mexico/mexico-city",
-  "south-korea/seoul",
-  "turkey/istanbul",
-  "uk/london",
-  "usa/new-york"
+  # "austria/linz",
+  # "australia/perth",
+  # "france/paris",
+  # "indonesia/denpasar",
+  # "japan/tokyo",
+  # "kenya/nairobi",
+  # "mexico/mexico-city",
+  # "south-korea/seoul",
+  # "turkey/istanbul",
+  # "uk/london",
+  # "usa/new-york"
+  "indonesia/yogyakarta",
+  "indonesia/jakarta"
 )
 
 for (year in 2021:2030) {
@@ -80,10 +82,10 @@ for (year in 2021:2030) {
 }
 
 # Combine all scraped data frames into a single data frame
-daylight_data <- bind_rows(all_data) %>%
+daylight_data_2 <- bind_rows(all_data) %>%
   mutate(download_timestamp = Sys.time())
 
-daylight_data <- daylight_data %>% 
+daylight_data_2 <- daylight_data_2 %>% 
   mutate(
     day = var1,
     sunrise_time = str_extract(var2, "\\d{2}:\\d{2}"),
@@ -97,32 +99,24 @@ daylight_data <- daylight_data %>%
     CT_start = var10,
     CT_end = var11,
     SN_time = str_extract(var12, "\\d{2}:\\d{2}"),
-    SN_mil_km = var13
+    SN_mil_km = as.numeric(gsub(",", "", var13)),
+    date = as.Date(paste(year, month, day, sep = "-")),
+    country = str_split(city, "/", simplify = TRUE)[, 1],
+    city = str_split(city, "/", simplify = TRUE)[, 2]
   ) %>% 
   select(-contains("var"))
 
-daylight_data <- daylight_data %>% 
-  mutate(
-    SN_mil_km = as.numeric(gsub(",", "", SN_mil_km))
-  )
-
-daylight_data <- daylight_data %>% 
-  mutate(
-    date = as.Date(paste(year, month, day, sep = "-"))
-  )
-
-daylight_data <- daylight_data %>% 
-  mutate(
-    country = str_split(city, "/", simplify = TRUE)[, 1],
-    city = str_split(city, "/", simplify = TRUE)[, 2]
-  )
+sun_data <- bind_rows(
+  daylight_data,
+  daylight_data_2
+)
 
 # View the combined data
 print(daylight_data)
 
 save(
-  daylight_data,
-  file = "data/daylight_data.RData"
+  sun_data,
+  file = "data/sun_data.RData"
 )
 
 
