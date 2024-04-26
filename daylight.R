@@ -1,7 +1,7 @@
 library(rvest)
 library(tidyverse)
 
-# Data collection ----
+# Data collection from timeanddate.com ----
 # Function to scrape and tidy the table for a specific month and year
 scrape_and_tidy_table <- function(month, year, city) {
   # Construct the URL
@@ -54,17 +54,17 @@ all_data <- list()
 
 # Iterate over years, months, and cities
 cities <- c(
-  # "austria/linz",
-  # "australia/perth",
-  # "france/paris",
-  # "indonesia/denpasar",
-  # "japan/tokyo",
-  # "kenya/nairobi",
-  # "mexico/mexico-city",
-  # "south-korea/seoul",
-  # "turkey/istanbul",
-  # "uk/london",
-  # "usa/new-york"
+  "austria/linz",
+  "australia/perth",
+  "france/paris",
+  "indonesia/denpasar",
+  "japan/tokyo",
+  "kenya/nairobi",
+  "mexico/mexico-city",
+  "south-korea/seoul",
+  "turkey/istanbul",
+  "uk/london",
+  "usa/new-york",
   "indonesia/yogyakarta",
   "indonesia/jakarta"
 )
@@ -120,10 +120,7 @@ save(
 )
 
 
-# Daylength plot ----
-library(tidyverse)
-
-# Daylength plot ----
+## Daylength plot ----
 daylight_data %>% 
   filter(
     city %in% c("denpasar", "linz"),
@@ -157,7 +154,7 @@ daylight_data %>%
     y = "Daylength (hours)"
   )
 
-# Sunset plot ----
+## Sunset plot ----
 daylight_data %>% 
   filter(
     city %in% c("denpasar", "linz"),
@@ -191,3 +188,60 @@ daylight_data %>%
     x = "Date",
     y = "Daylength (hours)"
   )
+
+# Data {suncalc} ----
+library(tidyverse)
+library(suncalc)
+library(lutz)
+
+## Persiapan data ----
+load("data/koordinat_kota.RData")
+koordinat_kota <- koordinat_kota %>% 
+  select(kota, lintang, bujur) %>% 
+  rename(
+    city = kota,
+    lat = lintang,
+    lon = bujur
+  )
+date_v <- seq(
+  from = as.Date("2023-01-01"),
+  to = as.Date("2023-12-31"),
+  by = "day"
+)
+tanggal_koordinat <- data.frame(
+  date = rep(date_v, length(koordinat_kota$lat)),
+  lat = rep(koordinat_kota$lat, each = length(date_v)),
+  lon = rep(koordinat_kota$lon, each = length(date_v)),
+  city = rep(koordinat_kota$city, each = length(date_v))
+)
+
+## Ambil data ----
+dat <- suncalc::getSunlightTimes(
+  data = tanggal_koordinat
+) %>% 
+  as_tibble() %>%
+  left_join(
+    koordinat_kota,
+    by = join_by(lat, lon)
+    ) %>% 
+  mutate(
+    tz = lutz::tz_lookup_coords(lat, lon, "fast", warn = F)
+  )
+dat_filtered <- dat %>% 
+  filter(city %in% c("New York", "Auckland")) %>% 
+  pivot_longer(
+    cols = solarNoon:goldenHour,
+    names_to = "event",
+    values_to = "time"
+  ) %>% 
+  mutate(
+    time_diff = local_time(time, tz = tz, units = "secs")
+  ) %>% 
+  mutate(time_to = hms::hms(seconds_to_period(time_diff))) %>% 
+  filter(event == "sunrise")
+dat_filtered %>% 
+  ggplot(aes(x = date, y = time_to)) + 
+  geom_point(aes(color = city), alpha = .3) + 
+  facet_wrap(facets = vars(city), nrow = 2) +
+  theme_bw()
+

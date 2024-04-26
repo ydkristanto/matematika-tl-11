@@ -2,6 +2,7 @@ library(shiny)
 library(bslib)
 library(tidyverse)
 library(plotly)
+library(DT)
 
 # Data ----
 load(url("https://raw.githubusercontent.com/ydkristanto/matematika-tl-11/main/data/sun_data.RData"))
@@ -14,6 +15,17 @@ daftar_kota <- sun_data %>%
 nama_kota <- daftar_kota$city
 names(nama_kota) <- daftar_kota$kota
 daftar_statistik <- c(
+  "Lama hari (jam)" = "day_length",
+  "Lama malam (jam)" = "night_length",
+  "Perbedaan siang malam (jam)" = "diff",
+  "Matahari terbit" = "sunrise_time",
+  "Matahari terbenam" = "sunset_time",
+  "Fajar" = "CT_start",
+  "Senja" = "CT_end",
+  "Tengah hari" = "SN_time",
+  "Jarak matahari (ribu km)" = "SN_mil_km"
+)
+daftar_statistik_simpel <- c(
   "Lama hari" = "day_length",
   "Lama malam" = "night_length",
   "Perbedaan siang malam" = "diff",
@@ -26,7 +38,6 @@ daftar_statistik <- c(
 )
 
 # Tautan ----
-# Tautan ----
 tautan_apl_lain <- tags$a(
   shiny::icon("shapes"),
   "Lainnya",
@@ -36,14 +47,14 @@ tautan_apl_lain <- tags$a(
 tautan_github <- tags$a(
   shiny::icon("github"),
   "Github",
-  href = "https://github.com/ydkristanto/apl-derajat-rad",
+  href = "https://github.com/ydkristanto/matematika-tl-11",
   target = "_blank"
 )
 
 # Antarmuka ----
 ui <- page_navbar(
-  title = "Lama Hari",
-  id = "lama_hari",
+  title = "Kalkulator Matahari",
+  id = "matahari",
   ## Sidebar ----
   sidebar = sidebar(
     accordion(
@@ -53,7 +64,7 @@ ui <- page_navbar(
         selectInput(
           "statistik",
           div("Statistik:", style = "font-weight: bold;"),
-          daftar_statistik,
+          daftar_statistik_simpel,
           selected = "day_length"
         ),
         selectInput(
@@ -74,7 +85,7 @@ ui <- page_navbar(
           "kota",
           div("Kota:", style = "font-weight: bold;"),
           nama_kota,
-          selected = c("denpasar", "linz"),
+          selected = c("denpasar", "perth"),
           multiple = TRUE
         ),
         dateRangeInput(
@@ -93,25 +104,65 @@ ui <- page_navbar(
       )
     )
   ),
+  ## Eksplorasi ----
   nav_panel(
     title = "Eksplorasi",
+    ### Penyajian data ----
     navset_card_underline(
       title = "Penyajian Data",
       nav_panel(
         title = "Diagram",
         plotlyOutput("diagram")
       ),
+      ### Tabel ----
       nav_panel(
         title = "Tabel",
-        dataTableOutput("tabel")
+        DTOutput("tabel")
       ),
       full_screen = TRUE
     ),
     icon = shiny::icon("chart-simple")
   ),
+  ## Informasi ----
   nav_panel(
     title = "Informasi",
-    
+    layout_column_wrap(
+      width = 1 / 2,
+      navset_card_underline(
+        ### Tentang ----
+        nav_panel(
+          title = "Tentang",
+          p("Dasbor ini bertujuan untuk memvisualisasikan data tentang matahari. Misalnya, Anda dapat melihat dan membandingkan lamanya hari antara dua kota setiap waktunya. Anda juga dapat melihat kapan matahari terbit dan terbenam setiap waktunya."),
+          p("Bagi pendidik, aplikasi ini dapat digunakan untuk memfasilitasi peserta didiknya bermatematika. Aplikasi ini cocok untuk pembelajaran klasikal, penyelidikan dalam kelompok kecil maupun individu. Sebagai saran, pendidik dapat menyiapkan beberapa masalah tentang pemodelan matematika.")
+        ),
+        nav_panel(
+          ### Alat ----
+          title = "Alat",
+          p("Aplikasi ini dikembangkan dengan menggunakan bahasa pemrograman", a("R", href = "https://www.R-project.org/", target = "_blank"), "dan paket", a("Shiny.", href = "https://CRAN.R-project.org/package=shiny", target = "_blank"), "Paket", a("shinylive", href = "https://posit-dev.github.io/r-shinylive/", target = "_blank"), "digunakan untuk mengekspor aplikasi ini agar dapat dijalankan di peramban web tanpa peladen R yang terpisah. Tata letak dasbor ini diatur dengan menggunakan ", a("bslib.", href = "https://CRAN.R-project.org/package=bslib", target = "_blank"), " Visualisasi datanya menggunakan ", a("ggplot2", href = "https://ggplot2.tidyverse.org", target = "_blank"), " dan ", a("plotly.", href = "https://plotly-r.com", target = "_blank"))
+        ),
+        nav_panel(
+          ### Pengembang ----
+          title = "Pengembang",
+          p("Pengembang dan pemelihara aplikasi ini adalah", a("Yosep Dwi Kristanto,", href = "https://people.usd.ac.id/~ydkristanto/", target = "_blank"), "seorang dosen dan peneliti di program studi", a("Pendidikan Matematika,", href = "https://usd.ac.id/s1pmat", target = "_blank"), a("Universitas Sanata Dharma,", href = "https://www.usd.ac.id/", target = "_blank"), "Yogyakarta.")
+        ),
+        nav_panel(
+          ### Kode Sumber ----
+          title = "Kode Sumber",
+          p("Kode sumber aplikasi ini tersedia di", a("repositori Github.", href = "https://github.com/ydkristanto/matematika-tl-11", target = "_blank"), "Jika Anda ingin melaporkan masalah atau meminta fitur tambahan terhadap aplikasi ini, silakan", a("buat sebuah isu", href = "https://github.com/ydkristanto/matematika-tl-11/issues", target = "_blank"), "atau lebih baik lagi", a("minta penarikan", href = "https://github.com/ydkristanto/matematika-tl-11/pulls", target = "_blank"), "di repositori tersebut.")
+        )
+      ),
+      ### Data ----
+      card(
+        card_header(
+          "Data"
+        ),
+        card_body(
+          p(
+            "Aplikasi ini menggunakan data yang diunduh dari ", a("www.timeanddate.com", href = "https://www.timeanddate.com/", target = "_blank"), " pada 22 April 2024."
+          )
+        )
+      )
+    ),
     icon = shiny::icon("circle-info")
   ),
   nav_spacer(),
@@ -121,6 +172,10 @@ ui <- page_navbar(
     nav_item(tautan_github),
     icon = shiny::icon("link"),
     align = "right"
+  ),
+  footer = div(
+    "© 2024 Yosep Dwi Kristanto",
+    style = "font-size: 0.8em; text-align: right;"
   )
 )
 
@@ -138,6 +193,17 @@ server <- function(input, output, session) {
         city %in% kota,
         date >= min_tanggal,
         date <= maks_tanggal
+      ) %>% 
+      mutate(
+        night_length = 24 - day_length,
+        sunrise_time = as.POSIXct(sunrise_time, format = "%H:%M"),
+        sunset_time = as.POSIXct(sunset_time, format = "%H:%M"),
+        CT_start = as.POSIXct(CT_start, format = "%H:%M"),
+        CT_end = as.POSIXct(CT_end, format = "%H:%M"),
+        SN_time = as.POSIXct(SN_time, format = "%H:%M")
+      ) %>% 
+      mutate(
+        diff = day_length - night_length
       )
     
     data
@@ -158,11 +224,17 @@ server <- function(input, output, session) {
     # Menyiapkan data
     if(periode == "hari") {
       plot <- dat() %>% 
-        select(date, statistik, city) %>% 
+        select(date, tidyselect::all_of(statistik), city) %>% 
         mutate(city = str_to_title(city)) %>% 
         ggplot(aes(x = date, y = .data[[statistik]])) +
         geom_point(
-          aes(color = city),
+          aes(
+            color = city,
+            text = sprintf(
+              "<b>Kota: %s</b><br>Tanggal: %s<br>%s: %s",
+              city, date, teks, .data[[statistik]]
+            )
+          ),
           size = 2,
           alpha = .2
         ) +
@@ -179,16 +251,22 @@ server <- function(input, output, session) {
       nama_var <- paste0(statistik, "_mean")
       
       data <- dat() %>% 
-        select(date, all_of(statistik), city) %>% 
+        select(date, tidyselect::all_of(statistik), city) %>% 
         drop_na() %>% 
-        mutate(bulan = format(date, "%Y-%m")) %>%
+        mutate(bulan = floor_date(date, "month")) %>%
         group_by(city, bulan) %>%
-        summarise_at(statistik, funs(mean)) %>% 
+        summarise_at(statistik, .funs = list(mean)) %>% 
         mutate(city = str_to_title(city))
       plot <- data %>% 
         ggplot(aes(x = bulan, y = .data[[statistik]])) +
         geom_point(
-          aes(color = city),
+          aes(
+            color = city,
+            text = sprintf(
+              "<b>Kota: %s</b><br>Bulan: %s<br>%s: %s",
+              city, bulan, teks, .data[[statistik]]
+            )
+          ),
           size = 3,
           alpha = .8
         ) +
@@ -204,7 +282,7 @@ server <- function(input, output, session) {
       
     }
     
-    ggplotly(plot) %>% 
+    ggplotly(plot, tooltip = c("text")) %>% 
       layout(
         legend = list(
           orientation = 'h', y = 100, xanchor = "center", x = .5
@@ -212,11 +290,91 @@ server <- function(input, output, session) {
       )
   })
   
-  ## Tabel ----
-  output$tabel <- renderDataTable({
+  ## Data table ----
+  dat_table <- reactive({
     periode <- input$periode
+    kota <- input$kota
+    min_tanggal <- input$interval[1]
+    maks_tanggal <- input$interval[2]
+    statistik <- input$statistik
+    nama_kolom <- names(daftar_statistik)[which(daftar_statistik %in% statistik)] %>% 
+      str_to_title()
+    
+    # Menyiapkan data_awal
+    data_awal <- sun_data %>% 
+      mutate(
+        day_length = round(day_length, 2),
+        night_length = round(24 - day_length, 2)
+      ) %>% 
+      mutate(
+        diff = round(day_length - night_length, 2)
+      ) %>% 
+      filter(
+        city %in% kota,
+        date >= min_tanggal,
+        date <= maks_tanggal
+      )
+    
+    if(periode == "hari") {
+      data <- data_awal %>% 
+        select(
+          country,
+          city,
+          date,
+          all_of(statistik)
+        ) %>% 
+        rename(
+          Negara = country,
+          Kota = city,
+          Tanggal = date,
+          !!nama_kolom := .data[[statistik]]
+        ) %>% 
+        mutate(
+          Kota = str_to_title(str_replace_all(Kota, "-", " "),),
+          Negara = str_to_title(str_replace_all(Negara, "-", " "),)
+        )
+    } else if(periode == "bulan") {
+      data <- data_awal %>% 
+        mutate(
+          Bulan = format(date, "%Y-%m"),
+          sunrise_time = as.POSIXct(sunrise_time, format = "%H:%M"),
+          sunset_time = as.POSIXct(sunset_time, format = "%H:%M"),
+          CT_start = as.POSIXct(CT_start, format = "%H:%M"),
+          CT_end = as.POSIXct(CT_end, format = "%H:%M"),
+          SN_time = as.POSIXct(SN_time, format = "%H:%M")
+        ) %>% 
+        group_by(country, city, Bulan) %>% 
+        summarise_at(statistik, .funs = list(mean)) %>% 
+        rename(
+          Negara = country,
+          Kota = city
+        ) %>% 
+        mutate(
+          !!statistik := ifelse(
+            statistik %in% c(
+              "sunrise_time", "sunset_time", 
+              "CT_start", "CT_end", "SN_time"
+            ),
+            format(.data[[statistik]], format = "%H:%M"),
+            round(.data[[statistik]], 2)
+          ),
+          Kota = str_to_title(str_replace_all(Kota, "-", " "),),
+          Negara = str_to_title(str_replace_all(Negara, "-", " "),)
+        ) %>% 
+        rename(!!nama_kolom := .data[[statistik]])
+    }
+    
+    data
     
   })
+  
+  ## Tabel ----
+  output$tabel <- renderDT(
+    dat_table(),
+    options = list(
+      pageLength = 5
+    )
+  )
   
 }
 
