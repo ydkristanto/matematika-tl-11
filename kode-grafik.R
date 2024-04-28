@@ -48,20 +48,30 @@ p <- harga_rumah %>%
   ) +
   geom_point(
     color = "#E32D91",
-    size = 3,
+    size = 2,
     alpha = .8
   ) +
   scale_x_continuous(
     breaks = seq(2007, 2019, 2)
   ) +
-  theme_minimal(base_size = 12) +
+  theme_minimal(base_size = 9) +
   facet_wrap(vars(provinsi), nrow = 2) +
   labs(
     x = "Tahun",
     y = "Harga (Juta Rupiah)",
     title = "Rata-Rata Harga Tiap Unit\nPembangunan Rumah oleh Perum Perumnas",
-    caption = "Data: Badan Pusat Statistik"
+    caption = "Data: Badan Pusat Statistik, Perum Perumnas"
   )
+
+ggsave(
+  filename = "harga_rumah.png",
+  plot = p,
+  width = 12,
+  height = 6,
+  units = "cm",
+  dpi = 300,
+  bg = "white"
+)
 
 # Harga gabah ----
 #' Data diunduh dari https://www.bps.go.id/id/statistics-table/2/MTAzNCMy/rata-rata-harga-gabah-bulanan-menurut-kualitas--komponen-mutu-dan-hpp-di-tingkat-petani.html
@@ -112,15 +122,28 @@ p1 <- PoU %>%
     linewidth = 1
   ) + 
   scale_y_continuous(labels = scales::label_percent(scale = 1)) +
-  theme_minimal(base_size = 7) + 
-  theme(
-    axis.title.x = element_blank(),
-    axis.text.x = element_blank()
-  ) + 
+  theme_minimal(base_size = 9) + 
   labs(
-    title = "Prevalensi Ketidakcukupan\nKonsumsi Pangan",
-    y = "Proporsi"
+    x = "Tahun",
+    y = "Proporsi",
+    caption = "Data: Badan Pusat Statistik, Susenas"
   )
+
+PoU_ID <- filter(PoU, provinsi == "Indonesia")
+model_ID <- lm(
+  formula = pou ~ poly(tahun, 4),
+  data = PoU_ID
+)
+
+ggsave(
+  filename = "prev_pangan.png",
+  plot = p1,
+  width = 9.6,
+  height = 4.8,
+  units = "cm",
+  dpi = 300,
+  bg = "white"
+)
 
 # Produksi padi ----
 load("data/produksi_padi.RData")
@@ -151,13 +174,21 @@ p2 <- produksi_padi %>%
     )
   ) + 
   scale_x_continuous(breaks = seq(2018, 2022, 2), limits = c(2017, 2023)) + 
-  theme_minimal(base_size = 7) + 
+  theme_minimal(base_size = 9) + 
   labs(
-    title = "Produksi Padi",
     x = "Waktu",
-    y = "Produksi\n(Juta Ton)",
-    caption = "Data: Badan Pusat Statistik (bps.go.id)"
+    y = "Produksi (Juta Ton)",
+    caption = "Data: Badan Pusat Statistik, Susenas"
   )
+ggsave(
+  filename = "produksi_gabah.png",
+  plot = p2,
+  width = 9.6,
+  height = 4.8,
+  units = "cm",
+  dpi = 300,
+  bg = "white"
+)
 
 plot <- p1 / p2
 ggsave(
