@@ -245,3 +245,7 @@ dat_filtered %>%
   facet_wrap(facets = vars(city), nrow = 2) +
   theme_bw()
 
+# Data Proyek ----
+
+
+

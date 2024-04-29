@@ -39,8 +39,7 @@ CT_dat <- dat %>%
 tidy_dat <- bind_rows(
   day_dat,
   CT_dat,
-  NT_dat,
-  AST_dat
+  NT_dat
 ) %>% 
   mutate(
     event = factor(
@@ -56,7 +55,7 @@ tidy_dat_filtered <- tidy_dat %>%
   filter(
     date >= as.Date("2023-01-01"),
     date <= as.Date("2023-12-31"),
-    city %in% c("Perth", "New York")
+    city %in% c("Perth", "London")
   )
 tidy_dat_filtered %>% 
   ggplot(aes(x = date, ymin = start, ymax = end, fill = event)) + 
