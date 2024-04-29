@@ -246,6 +246,35 @@ dat_filtered %>%
   theme_bw()
 
 # Data Proyek ----
+load(url("https://raw.githubusercontent.com/ydkristanto/matematika-tl-11/main/data/sun_data.RData"))
 
+data_lama_hari <- sun_data %>% 
+  filter(
+    city %in% c("denpasar", "perth"),
+    date >= as.Date("2023-01-01"),
+    date <= as.Date("2024-12-31")
+  ) %>% 
+  select(city, date, day_length) %>% 
+  arrange(city, date) %>% 
+  mutate(
+    city = str_to_title(city),
+    month = month(date) + 12 * (year(date) - 2023)
+  ) %>% 
+  group_by(city, month) %>% 
+  summarise(
+    daylength_avg = mean(day_length, na.rm = TRUE),
+    .groups = "drop"
+  ) %>% 
+  rename(
+    kota = city,
+    bulan = month,
+    rrt_lama_hari = daylength_avg
+  )
+
+write_csv(
+  data_lama_hari,
+  file = "data/lama_hari_dps_perth.csv",
+  quote = "needed"
+)
 
 
