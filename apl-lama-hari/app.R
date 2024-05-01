@@ -380,6 +380,9 @@ server <- function(input, output, session) {
               "Malam 2" = "#2f464e"
             )
           ) + 
+          scale_x_date(
+            labels = scales::label_date(format = "%b %Y", locale = "id")
+          ) + 
           scale_y_time(
             limits = c(hms::parse_hm("00:00"), hms::parse_hm("24:00")),
             labels = scales::label_time(format = "%H:%M"),
@@ -435,6 +438,9 @@ server <- function(input, output, session) {
               "Malam 2" = "#2f464e"
             )
           ) + 
+          scale_x_date(
+            labels = scales::label_date(format = "%b %Y", locale = "id")
+          ) + 
           scale_y_time(
             limits = c(hms::parse_hm("00:00"), hms::parse_hm("24:00")),
             labels = scales::label_time(format = "%H:%M"),
@@ -451,7 +457,10 @@ server <- function(input, output, session) {
       } else if((length(kota) == 0)) {
         plot <- dat_ringkasan() %>% 
           ggplot() + 
-          geom_blank() +
+          geom_blank() + 
+          scale_x_date(
+            labels = scales::label_date(format = "%b %Y", locale = "id")
+          ) + 
           scale_y_time(
             limits = c(hms::parse_hm("00:00"), hms::parse_hm("24:00")),
             labels = scales::label_time(format = "%H:%M"),
@@ -482,7 +491,10 @@ server <- function(input, output, session) {
           ),
           size = 2,
           alpha = .2
-        ) +
+        ) + 
+        scale_x_date(
+          labels = scales::label_date(format = "%b %Y", locale = "id")
+        ) + 
         scale_color_manual(
           values = palet_warna,
           name = "Kota"
@@ -514,7 +526,10 @@ server <- function(input, output, session) {
           ),
           size = 3,
           alpha = .8
-        ) +
+        ) + 
+        scale_x_date(
+          labels = scales::label_date(format = "%b %Y", locale = "id")
+        ) + 
         scale_color_manual(
           values = palet_warna,
           name = "Kota"

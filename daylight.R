@@ -248,6 +248,7 @@ dat_filtered %>%
 # Data Proyek ----
 load(url("https://raw.githubusercontent.com/ydkristanto/matematika-tl-11/main/data/sun_data.RData"))
 
+## Merapikan data ----
 data_lama_hari <- sun_data %>% 
   filter(
     city %in% c("denpasar", "perth"),
@@ -277,4 +278,28 @@ write_csv(
   quote = "needed"
 )
 
+## Membuat model ----
+data_lama_hari_dps <- data_lama_hari %>% 
+  filter(kota == "Denpasar")
+data_lama_hari_perth <- data_lama_hari %>% 
+  filter(kota == "Perth")
 
+min_dps <- min(data_lama_hari_dps$rrt_lama_hari)
+maks_dps <- max(data_lama_hari_dps$rrt_lama_hari)
+min_perth <- min(data_lama_hari_perth$rrt_lama_hari)
+maks_perth <- max(data_lama_hari_perth$rrt_lama_hari)
+a_dps <- (maks_dps - min_dps) / 2
+d_dps <- (maks_dps + min_dps) / 2
+a_perth <- (maks_perth - min_perth) / 2
+d_perth <- (maks_perth + min_perth) / 2
+
+model_dps <- nls(
+  formula = rrt_lama_hari ~ a * sin(b * bulan + c) + d,
+  data = data_lama_hari_dps,
+  start = list(a = a_dps, b = 2 * pi / 11, c = 0, d = d_dps)
+)
+fit <- function(x, a, b, c, d) {
+  a * sin(b * x + c) + d
+}
+plot(x = data_lama_hari_dps$bulan, y = data_lama_hari_dps$rrt_lama_hari)
+curve(fit(x, coef(model_dps)["a"], coef(model_dps)["b"], coef(model_dps)["c"], coef(model_dps)["d"]), add = TRUE)
