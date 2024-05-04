@@ -122,11 +122,11 @@ p1 <- PoU %>%
     linewidth = 1
   ) + 
   scale_y_continuous(labels = scales::label_percent(scale = 1)) +
-  theme_minimal(base_size = 9) + 
+  theme_minimal(base_size = 6) + 
   labs(
+    title = "Prevalensi Ketidakcukupan\nKonsumsi Pangan",
     x = "Tahun",
-    y = "Proporsi",
-    caption = "Data: Badan Pusat Statistik, Susenas"
+    y = "Proporsi"
   )
 
 PoU_ID <- filter(PoU, provinsi == "Indonesia")
@@ -174,12 +174,14 @@ p2 <- produksi_padi %>%
     )
   ) + 
   scale_x_continuous(breaks = seq(2018, 2022, 2), limits = c(2017, 2023)) + 
-  theme_minimal(base_size = 9) + 
+  theme_minimal(base_size = 6) + 
   labs(
+    title = "Produksi Gabah",
     x = "Waktu",
-    y = "Produksi (Juta Ton)",
+    y = "Produksi\n(Juta Ton)",
     caption = "Data: Badan Pusat Statistik, Susenas"
   )
+
 ggsave(
   filename = "produksi_gabah.png",
   plot = p2,
@@ -192,7 +194,7 @@ ggsave(
 
 plot <- p1 / p2
 ggsave(
-  filename = "statistik_pangan.png",
+  filename = "plot/statistik_pangan.png",
   plot = plot,
   width = 8,
   height = 6,

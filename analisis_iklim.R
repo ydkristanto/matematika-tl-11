@@ -151,6 +151,8 @@ matriks_suhu_jypr_sederhana <- matrix(
   )
 )
 
+matriks_slsh_suhu_sby_jypr <- matriks_suhu_sby_sederhana - matriks_suhu_jypr_sederhana
+
 # Visualisasi data ----
 heatmap_bulanan <- data_iklim_bulanan %>% 
   filter(
@@ -184,32 +186,95 @@ heatmap_sederhana <- data_iklim_sederhana %>%
   ) %>% 
   ggplot(aes(x = dasawarsa_lbl, y = triwulan_lbl)) + 
   geom_tile(aes(fill = suhu)) + 
-  scale_fill_viridis_c(name = "Suhu") + 
+  scale_fill_viridis_c(name = "Rata-Rata\nSuhu (°C)") + 
   facet_wrap(vars(wilayah)) + 
-  theme_minimal(base_size = 16) + 
+  theme_minimal(base_size = 8) + 
   theme(
-    axis.title = element_blank()
+    axis.title = element_blank(),
+    legend.position = "bottom",
+    legend.title = element_text(vjust = 1, hjust = 1)
   ) + 
   labs(
-    title = "Suhu Rata-Rata Jayapura dan Surabaya",
     caption = "Data: NASA POWER (power.larc.nasa.gov)"
   )
+ggsave(
+  filename = "plot/suhu_jypr_sby_matriks.png",
+  plot = heatmap_sederhana,
+  width = 12,
+  height = 6,
+  units = "cm",
+  dpi = 300,
+  bg = "white"
+)
 
-data_iklim_bulanan %>% 
+suhu_selisih_matriks <- data_iklim_sederhana %>% 
+  filter(
+    wilayah %in% c("Jayapura", "Surabaya"),
+    dasawarsa < 5
+  ) %>% 
+  select(-curah_hujan) %>% 
+  pivot_wider(names_from = wilayah, values_from = suhu) %>% 
+  mutate(selisih_suhu = Jayapura - Surabaya) %>% 
+  mutate(
+    triwulan_lbl = fct_reorder(triwulan_lbl, triwulan),
+    dasawarsa_lbl = fct_reorder(dasawarsa_lbl, dasawarsa)
+  ) %>% 
+  ggplot(aes(x = dasawarsa_lbl, y = triwulan_lbl)) + 
+  geom_tile(aes(fill = selisih_suhu)) + 
+  scale_fill_viridis_c(name = "Selisih Rata-Rata\nSuhu (°C)", option = "magma") + 
+  theme_minimal(base_size = 8) + 
+  theme(
+    axis.title = element_blank(),
+    legend.position = "bottom",
+    legend.title = element_text(vjust = 1, hjust = 1)
+  ) + 
+  labs(
+    caption = "Data: NASA POWER (power.larc.nasa.gov)"
+  )
+ggsave(
+  filename = "plot/suhu_selisih_matriks.png",
+  plot = suhu_selisih_matriks,
+  width = 9.6,
+  height = 5.4,
+  units = "cm",
+  dpi = 300,
+  bg = "white"
+)
+
+palet_slsh <- colorRampPalette(
+  c("#ca0020", "#f7f7f7", "#0571b0")
+)
+heatmap(
+  matriks_slsh_suhu_sby_jypr,
+  col = palet_slsh(100),
+  Colv = NA,
+  Rowv = NA
+)
+
+diagram_garis <- data_iklim_bulanan %>% 
   filter(
     tahun <= 2023,
-    wilayah %in% c("Ruteng", "Surabaya")
+    wilayah %in% c("Jayapura", "Surabaya")
   ) %>% 
-  group_by(wilayah, tahun) %>% 
-  summarise(
-    suhu = mean(suhu, na.rm = TRUE),
-    curah_hujan = mean(curah_hujan, na.rm = TRUE),
-    .groups = "drop"
-  ) %>% 
-  ggplot(aes(x = tahun, y = suhu)) + 
+  ggplot(aes(x = bulan, y = suhu)) + 
   geom_line(
     aes(group = wilayah, color = wilayah),
-    linewidth = 1
+    linewidth = .5
   ) + 
-  scale_color_viridis_d() + 
-  theme_minimal()
+  scale_color_viridis_d(name = "") + 
+  theme_minimal(base_size = 8) + 
+  theme(legend.position = "bottom") + 
+  labs(
+    x = "Waktu",
+    y = "Rata-Rata Suhu (°C)",
+    caption = "Data: NASA POWER (power.larc.nasa.gov)"
+  )
+ggsave(
+  filename = "plot/suhu_jypr_sby_garis.png",
+  plot = diagram_garis,
+  width = 12,
+  height = 6,
+  units = "cm",
+  dpi = 300,
+  bg = "white"
+)
