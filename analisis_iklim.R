@@ -198,7 +198,7 @@ heatmap_sederhana <- data_iklim_sederhana %>%
     caption = "Data: NASA POWER (power.larc.nasa.gov)"
   )
 ggsave(
-  filename = "plot/suhu_jypr_sby_matriks.png",
+  filename = "plot/suhu_jypr_sby_matriks.svg",
   plot = heatmap_sederhana,
   width = 12,
   height = 6,
@@ -232,7 +232,7 @@ suhu_selisih_matriks <- data_iklim_sederhana %>%
     caption = "Data: NASA POWER (power.larc.nasa.gov)"
   )
 ggsave(
-  filename = "plot/suhu_selisih_matriks.png",
+  filename = "plot/suhu_selisih_matriks.svg",
   plot = suhu_selisih_matriks,
   width = 9.6,
   height = 5.4,
@@ -270,7 +270,7 @@ diagram_garis <- data_iklim_bulanan %>%
     caption = "Data: NASA POWER (power.larc.nasa.gov)"
   )
 ggsave(
-  filename = "plot/suhu_jypr_sby_garis.png",
+  filename = "plot/suhu_jypr_sby_garis.svg",
   plot = diagram_garis,
   width = 12,
   height = 6,

@@ -1,6 +1,7 @@
 # Paket ----
 library(tidyverse)
 library(patchwork)
+library(readxl)
 palet_warna <- c(
   "#E32D91", "#4EA6DC", "#4775E7",
   "#8971E1", "#C830CC"
@@ -194,7 +195,7 @@ ggsave(
 
 plot <- p1 / p2
 ggsave(
-  filename = "plot/statistik_pangan.png",
+  filename = "plot/statistik_pangan.svg",
   plot = plot,
   width = 8,
   height = 6,
@@ -319,3 +320,19 @@ ggsave(
   units = "cm",
   dpi = 300
 )
+
+# Model hubungan antara spesies dan luas (SAR) ----
+# Data: Schrader dkk. (2020), https://doi.org/10.3897/BDJ.8.e55275
+data_pulau <- read_excel("data/data_pulau.xlsx")
+
+data_pulau %>% 
+  filter(species_number > 0) %>% 
+  ggplot(aes(x = island_area, y = species_number)) + 
+  geom_smooth(alpha = .1) +
+  geom_point(size = 3) + 
+  scale_x_continuous(trans = "log10") + 
+  scale_color_viridis_b() + 
+  theme_minimal()
+
+
+
