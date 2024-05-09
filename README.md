@@ -12,7 +12,7 @@ Data disimpan dalam folder `/data`. Kategori dan sumber data dalam folder terseb
 
 -   Data perum perumnas. Data ini diperoleh dari [BPS, Perum Perumnas](https://www.bps.go.id/id/statistics-table/2/MjU2IzI=/rata-rata-harga-unit-pembangunan-rumah-oleh-perum-perumnas.html).
 
--   Data prevalensi ketidakcukupan konsumsi pangan. Data ini diperoleh dari [BPS/Susenas](https://www.bps.go.id/id/statistics-table/2/MTQ3MyMy/prevalensi-ketidakcukupan-konsumsi-pangan--persen-.html).
+-   Data prevalensi ketidakcukupan konsumsi pangan. Data ini diperoleh dari [BPS, Susenas](https://www.bps.go.id/id/statistics-table/2/MTQ3MyMy/prevalensi-ketidakcukupan-konsumsi-pangan--persen-.html).
 
 -   Data produktivitas padi/gabah. Data ini diperoleh dari [BPS](https://www.bps.go.id/id/statistics-table/2/MTQ5OCMy/luas-panen--produksi--dan-produktivitas-padi-menurut-provinsi.html).
 
