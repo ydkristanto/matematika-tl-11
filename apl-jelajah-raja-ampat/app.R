@@ -27,13 +27,28 @@ ui <- page_navbar(
         "Eksponensial Negatif",
         "Fungsi Rasional"
       )
+    ),
+    checkboxInput(
+      "transform", "Transformasi luas",
+      value = TRUE
     )
   ),
   nav_panel(
-    title = "Eksplorasi"
+    title = "Eksplorasi",
+    navset_card_underline(
+      title = "Data dan Model",
+      nav_panel(
+        title = "Plot"
+      ),
+      nav_panel(
+        title = "Data"
+      )
+    ),
+    icon = shiny::icon("chart-simple")
   ),
   nav_panel(
-    title = "Informasi"
+    title = "Informasi",
+    icon = shiny::icon("circle-info")
   )
 )
 

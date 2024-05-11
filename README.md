@@ -16,6 +16,8 @@ Data disimpan dalam folder `/data`. Kategori dan sumber data dalam folder terseb
 
 -   Data produktivitas padi/gabah. Data ini diperoleh dari [BPS](https://www.bps.go.id/id/statistics-table/2/MTQ5OCMy/luas-panen--produksi--dan-produktivitas-padi-menurut-provinsi.html).
 
+-   Data hubungan spesies dan luas wilayah. Data ini diperoleh dari [*Biodiversity Data Journal*](https://doi.org/10.3897/BDJ.8.e55275).
+
 ## Diagram
 
 Diagram (atau grafik) disimpan dalam folder `/plot`.
