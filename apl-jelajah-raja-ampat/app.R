@@ -37,7 +37,7 @@ ui <- page_navbar(
     selectInput(
       "analisis",
       div("Tingkat Analisis:", style = "font-weight:bold;"),
-      choices = c("Pulau", "Transek", "Plot"),
+      choices = c("Pulau", "Transek", "Subtransek" = "Plot"),
       selected = "Pulau"
     ),
     ### Model ----
@@ -129,7 +129,11 @@ ui <- page_navbar(
         ),
         card_body(
           p("Aplikasi ini menggunakan data yang disediakan oleh Schrader dkk. Data tersebut dipublikasikan di dalam ", a(tags$i("Biodiversity Data Journal."), href = "https://doi.org/10.3897/BDJ.8.e55275", target = "_blank")),
-          p("Data tersebut memuat banyak variabel. Variabel-variabel yang penting dalam aplikasi ini adalah tingkat analisis, luas pulau, dan banyak spesies. Tingkat analisisnya terbagi menjadi tiga, yaitu pulau, transek, dan plot (subtransek). Transek merupakan wilayah persegi panjang di dalam pulau sedangkan plot merupakan wilayah persegi sebagai bagian dari transek. Untuk lebih jelasnya, silakan baca ", a("Schrader dkk. (2019).", href = "https://doi.org/10.1111/ecog.04512", target = "_blank"))
+          p("Data tersebut memuat banyak variabel. Variabel-variabel yang penting dalam aplikasi ini adalah tingkat analisis, luas pulau, dan banyak spesies. Tingkat analisisnya terbagi menjadi tiga, yaitu pulau, transek, dan subtransek. Transek merupakan wilayah persegi panjang di dalam pulau sedangkan subtransek merupakan wilayah persegi sebagai bagian dari transek. Untuk lebih jelasnya, perhatikan gambar berikut ", a("(Schrader dkk., 2019).", href = "https://doi.org/10.1111/ecog.04512", target = "_blank")),
+          div(
+            htmlOutput("keterangan_transek"),
+            style = "text-align:center;"
+          )
         )
       )
     )
@@ -154,6 +158,11 @@ server <- function(input, output, session) {
   ## gambar_fitur ----
   output$gambar_fitur <- renderText({
     '<img src = "https://people.usd.ac.id/~ydkristanto/wp-content/uploads/2024/05/raja-ampat-feature-01.png" width = "100%">'
+  })
+  
+  ## keterangan_transek ----
+  output$keterangan_transek <- renderText({
+    '<img src = "https://people.usd.ac.id/~ydkristanto/wp-content/uploads/2024/05/pulau-transek-subtransek-01.png" width = "80%" alt = "Transek dan substransek dalam pulau.">'
   })
   
   ## Data pulau ----
@@ -673,12 +682,6 @@ server <- function(input, output, session) {
         )
       }
     }
-  })
-  
-  ## sse ----
-  output$sse <- renderUI({
-    sse <- deviance(model())
-    sprintf("$$SSE \\approx %.03f$$", sse)
   })
   
 }
