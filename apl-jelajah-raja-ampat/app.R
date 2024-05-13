@@ -63,6 +63,14 @@ ui <- page_navbar(
     checkboxInput(
       "plot_model", "Plot model",
       value = TRUE
+    ),
+    ### Galat
+    conditionalPanel(
+      "input.plot_model",
+      checkboxInput(
+        "galat", "Tampilkan galat",
+        value = FALSE
+      )
     )
   ),
   ## Panel utama ----
@@ -101,10 +109,19 @@ ui <- page_navbar(
         #### Tentang ----
         nav_panel(
           title = "Tentang",
-          p("Aplikasi berbasis web ini bertujuan untuk memodelkan hubungan antara banyak spesies dan luas wilayah (", tags$i("species–area relationship,"), " SAR) di Kepulauan Raja Ampat. Melalui aplikasi ini, Anda dapat menggunakan model-model matematis yang beragam, seperti model linear, eksponensial, dan logistik. Selain itu, Anda juga dapat membandingkan model-model tersebut untuk mendapatkan model yang paling baik."),
-          p("Bagi pendidik, aplikasi ini dapat digunakan untuk memfasilitasi peserta didik bermatematika. Misalnya, permasalahan berikut dapat diajukan kepada peserta didik."),
-          tags$blockquote("Model manakah yang menurutmu paling baik? Bagaimana strategimu dalam membandingkan model-model tersebut?"),
-          p("Dalam menjawab permasalahan tersebut, peserta didik dapat berdiskusi dengan teman-temannya dalam kelompok.")
+          markdown(
+            "Aplikasi berbasis web ini bertujuan untuk memodelkan hubungan antara banyaknya spesies tumbuhan berkayu dan luas wilayah (*species–area relationship*, SAR) di Kepulauan Raja Ampat. Melalui aplikasi ini, Anda dapat menggunakan model-model matematis yang beragam, seperti model linear, eksponensial, dan logistik. Selain itu, Anda juga dapat membandingkan model-model tersebut untuk mendapatkan model yang paling baik.
+
+Bagi pendidik, aplikasi ini dapat digunakan untuk memfasilitasi peserta didik bermatematika. Misalnya, permasalahan berikut dapat diajukan kepada peserta didik.
+
+> Model manakah yang menurutmu paling baik? Bagaimana strategimu dalam membandingkan model-model tersebut?
+
+Dalam menjawab permasalahan tersebut, peserta didik dapat berdiskusi dengan teman-temannya dalam kelompok. Untuk melakukannya, mereka dapat mengamati diagram pencar (dan modelnya) atau tabel yang disediakan. Diagram pencar tersebut dapat dilihat pada tab Plot sedangkan tabelnya dapat dilihat pada tab Data dalam laman Eksplorasi.
+
+Diagram pencar tersebut memperlihatkan hubungan antara luas wilayah dan banyaknya spesies tumbuhan berkayu. Tampilannya tergantung dari tingkat analisis yang dipilih, yaitu pulau, transek, dan subtransek. Ketika pulau yang dipilih, variabel `Banyak Spesies` menyatakan total banyaknya spesies tumbuhan berkayu dalam pulau tersebut. Ketika transek yang dipilih, variabel tersebut menyatakan rata-rata banyaknya spesies di setiap transek dalam sebuah pulau. Hal ini juga sama ketika subtransek yang terpilih.
+
+Tabel dalam tab Data memperlihatkan detail data yang ditampilkan pada diagram pencar. Data dalam tabel tersebut terdiri dari lima variabel, yaitu `ID Pulau`, `Luas`, `Banyak Spesies`, `Banyak Spesies (Pred. Model)`, dan `Galat`. Tiga variabel pertama cukup jelas. Variabel `Banyak Spesies (Pred. Model)` menyatakan (rata-rata) banyaknya spesies yang diperoleh dengan menginputkan `Luas` ke dalam model yang dihasilkan. Variabel `Galat` merupakan selisih antara `Banyak Spesies` dan `Banyak Spesies (Pred. Model)`."
+          )
         ),
         nav_panel(
           #### Alat ----
@@ -129,7 +146,7 @@ ui <- page_navbar(
         ),
         card_body(
           p("Aplikasi ini menggunakan data yang disediakan oleh Schrader dkk. Data tersebut dipublikasikan di dalam ", a(tags$i("Biodiversity Data Journal."), href = "https://doi.org/10.3897/BDJ.8.e55275", target = "_blank")),
-          p("Data tersebut memuat banyak variabel. Variabel-variabel yang penting dalam aplikasi ini adalah tingkat analisis, luas pulau, dan banyak spesies. Tingkat analisisnya terbagi menjadi tiga, yaitu pulau, transek, dan subtransek. Transek merupakan wilayah persegi panjang di dalam pulau sedangkan subtransek merupakan wilayah persegi sebagai bagian dari transek. Untuk lebih jelasnya, perhatikan gambar berikut ", a("(Schrader dkk., 2019).", href = "https://doi.org/10.1111/ecog.04512", target = "_blank")),
+          p("Data tersebut memuat banyak variabel. Variabel-variabel yang penting dalam aplikasi ini adalah tingkat analisis, luas pulau, dan banyak spesies tumbuhan berkayu. Tingkat analisisnya terbagi menjadi tiga, yaitu pulau, transek, dan subtransek. Transek merupakan wilayah persegi panjang di dalam pulau sedangkan subtransek merupakan wilayah persegi sebagai bagian dari transek. Untuk lebih jelasnya, perhatikan gambar berikut ", a("(Schrader dkk., 2019).", href = "https://doi.org/10.1111/ecog.04512", target = "_blank")),
           div(
             htmlOutput("keterangan_transek"),
             style = "text-align:center;"
@@ -163,6 +180,13 @@ server <- function(input, output, session) {
   ## keterangan_transek ----
   output$keterangan_transek <- renderText({
     '<img src = "https://people.usd.ac.id/~ydkristanto/wp-content/uploads/2024/05/pulau-transek-subtransek-01.png" width = "80%" alt = "Transek dan substransek dalam pulau.">'
+  })
+  
+  ## Sidebar galat ----
+  observeEvent(input$plot_model, {
+    if (!input$plot_model) {
+      updateCheckboxInput(getDefaultReactiveDomain(), "galat", value = FALSE)
+    }
   })
   
   ## Data pulau ----
@@ -508,15 +532,32 @@ server <- function(input, output, session) {
   ## plot ----
   output$plot <- renderPlotly({
     trans <- input$transform
+    pred <- fitted.values(model())
+    residu <- residuals(model())
     xlab_luas <- ifelse(
       trans, "log(Luas)", "Luas"
     )
     
+    # Data
+    data <- dat() %>% 
+      mutate(
+        pred_banyak_spesies = pred,
+        galat = residu
+      )
     # Plot
-    plot <- dat() %>% 
+    plot <- data %>% 
       ggplot(aes(x = luas, y = banyak_spesies)) + 
       list(
         theme_minimal(),
+        if(input$galat) geom_segment(
+          aes(
+            x = luas, y = banyak_spesies,
+            xend = luas, yend = pred_banyak_spesies
+          ),
+          color = "#8971E1",
+          linewidth = .3,
+          alpha = .75
+        ),
         geom_point(
           aes(
             text = sprintf(
