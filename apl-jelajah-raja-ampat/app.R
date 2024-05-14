@@ -86,7 +86,7 @@ ui <- page_navbar(
           div(
             withMathJax(),
             tags$h5("Model", style = "font-weight: bold;"),
-            p("Persamaan yang memodelkan banyaknya spesies (\\( y \\)) terhadap luasnya (\\( x \\)) adalah sebagai berikut."),
+            p("Model banyaknya spesies (\\( y \\)) tumbuhan berkayu terhadap luas wilayahnya (\\( x \\)) direpresentasikan ke dalam persamaan berikut."),
             uiOutput("pers_model")
           ),
           col_widths = c(8, 4)
@@ -120,7 +120,7 @@ Dalam menjawab permasalahan tersebut, peserta didik dapat berdiskusi dengan tema
 
 Diagram pencar tersebut memperlihatkan hubungan antara luas wilayah dan banyaknya spesies tumbuhan berkayu. Tampilannya tergantung dari tingkat analisis yang dipilih, yaitu pulau, transek, dan subtransek. Ketika pulau yang dipilih, variabel `Banyak Spesies` menyatakan total banyaknya spesies tumbuhan berkayu dalam pulau tersebut. Ketika transek yang dipilih, variabel tersebut menyatakan rata-rata banyaknya spesies di setiap transek dalam sebuah pulau. Hal ini juga sama ketika subtransek yang terpilih.
 
-Tabel dalam tab Data memperlihatkan detail data yang ditampilkan pada diagram pencar. Data dalam tabel tersebut terdiri dari lima variabel, yaitu `ID Pulau`, `Luas`, `Banyak Spesies`, `Banyak Spesies (Pred. Model)`, dan `Galat`. Tiga variabel pertama cukup jelas. Variabel `Banyak Spesies (Pred. Model)` menyatakan (rata-rata) banyaknya spesies yang diperoleh dengan menginputkan `Luas` ke dalam model yang dihasilkan. Variabel `Galat` merupakan selisih antara `Banyak Spesies` dan `Banyak Spesies (Pred. Model)`."
+Tabel dalam tab Data memperlihatkan detail data yang ditampilkan pada diagram pencar. Data dalam tabel tersebut terdiri dari lima variabel, yaitu `ID Pulau`, `Luas` (atau transformasinya, yaitu `log(Luas)`), `Banyak Spesies`, `Banyak Spesies (Pred. Model)`, dan `Galat`. Tiga variabel pertama cukup jelas. Variabel `Banyak Spesies (Pred. Model)` menyatakan (rata-rata) banyaknya spesies yang diperoleh dengan menginputkan `Luas` ke dalam model yang dihasilkan. Variabel `Galat` merupakan selisih antara `Banyak Spesies` dan `Banyak Spesies (Pred. Model)`."
           )
         ),
         nav_panel(
@@ -146,10 +146,10 @@ Tabel dalam tab Data memperlihatkan detail data yang ditampilkan pada diagram pe
         ),
         card_body(
           p("Aplikasi ini menggunakan data yang disediakan oleh Schrader dkk. Data tersebut dipublikasikan di dalam ", a(tags$i("Biodiversity Data Journal."), href = "https://doi.org/10.3897/BDJ.8.e55275", target = "_blank")),
-          p("Data tersebut memuat banyak variabel. Variabel-variabel yang penting dalam aplikasi ini adalah tingkat analisis, luas pulau, dan banyak spesies tumbuhan berkayu. Tingkat analisisnya terbagi menjadi tiga, yaitu pulau, transek, dan subtransek. Transek merupakan wilayah persegi panjang di dalam pulau sedangkan subtransek merupakan wilayah persegi sebagai bagian dari transek. Untuk lebih jelasnya, perhatikan gambar berikut ", a("(Schrader dkk., 2019).", href = "https://doi.org/10.1111/ecog.04512", target = "_blank")),
+          p("Data tersebut memuat banyak variabel. Variabel-variabel yang penting dalam aplikasi ini adalah tingkat analisis, luas pulau, dan banyak spesies tumbuhan berkayu. Tingkat analisisnya terbagi menjadi tiga, yaitu pulau, transek, dan subtransek. Transek merupakan wilayah persegi panjang di dalam pulau sedangkan subtransek merupakan wilayah persegi sebagai bagian dari transek. Untuk lebih jelasnya, perhatikan gambar berikut."),
           div(
             htmlOutput("keterangan_transek"),
-            style = "text-align:center;"
+            style = "text-align:center; text-size:0.8em;"
           )
         )
       )
@@ -179,7 +179,12 @@ server <- function(input, output, session) {
   
   ## keterangan_transek ----
   output$keterangan_transek <- renderText({
-    '<img src = "https://people.usd.ac.id/~ydkristanto/wp-content/uploads/2024/05/pulau-transek-subtransek-01.png" width = "80%" alt = "Transek dan substransek dalam pulau.">'
+    '
+    <figure>
+      <img src = "https://people.usd.ac.id/~ydkristanto/wp-content/uploads/2024/05/pulau-transek-subtransek-01.png" width = "80%" alt = "Transek dan substransek dalam pulau.">
+      <figcaption style = "font-size:0.75em;">Ilustrasi pulau, transek (10 m × 2 m), dan subtransek (2 m × 2 m). Banyaknya transek dalam sebuah pulau tergantung dari luas pulau tersebut. Pulau yang lebih besar memuat lebih banyak transek. [Gambar diadaptasi dari Schrader, Moeljono, Tambing, Sattler, & Kreft (<a href = "https://doi.org/10.3897/BDJ.8.e55275.figure1" target = "_blank">2020</a>) / <a href = "https://creativecommons.org/licenses/by/4.0/deed.id" target = "_blank">CC BY 4.0 DEED</a>] </figcaption>
+    </figure>
+    '
   })
   
   ## Sidebar galat ----
@@ -554,15 +559,15 @@ server <- function(input, output, session) {
             x = luas, y = banyak_spesies,
             xend = luas, yend = pred_banyak_spesies
           ),
-          color = "#8971E1",
-          linewidth = .3,
-          alpha = .75
+          linewidth = .4,
+          alpha = .75,
+          color = "#8971E1"
         ),
         geom_point(
           aes(
             text = sprintf(
               "<b>Luas:</b> %s<br><b>Banyak Spesies:</b> %s",
-              luas, banyak_spesies
+              round(luas, 2), round(banyak_spesies, 2)
             )
           ),
           color = "#E32D91",
@@ -609,18 +614,32 @@ server <- function(input, output, session) {
     pred <- fitted.values(model())
     residu <- residuals(model())
     
-    dat() %>% 
+    data <- dat() %>% 
       mutate(
         prediksi_banyak_spesies = round(pred, 2),
         galat = round(residu, 3)
-      ) %>% 
-      rename(
+      )
+    if(input$transform) {
+      data <- data %>% 
+        rename(
         `ID Pulau` = ID_pulau,
-        `Luas` = luas,
+        `log(Luas)` = luas,
         `Banyak Spesies` = banyak_spesies,
         `Banyak Spesies (Pred. Model)` = prediksi_banyak_spesies,
         `Galat` = galat
       )
+    } else {
+      data <- data %>% 
+        rename(
+          `ID Pulau` = ID_pulau,
+          `Luas` = luas,
+          `Banyak Spesies` = banyak_spesies,
+          `Banyak Spesies (Pred. Model)` = prediksi_banyak_spesies,
+          `Galat` = galat
+        )
+    }
+    
+    data
     
   })
   
@@ -687,7 +706,7 @@ server <- function(input, output, session) {
       
       if(input$transform) {
         withMathJax(
-          sprintf("$$y = \\frac{{%.03f + %.03f x}}{{1 + \\left( %.03f \\log x \\right)}}$$", c, z, d)
+          sprintf("$$y = \\frac{{%.03f + %.03f \\log x}}{{1 + \\left( %.03f \\log x \\right)}}$$", c, z, d)
         )
       } else {
         withMathJax(
@@ -715,7 +734,7 @@ server <- function(input, output, session) {
       
       if(input$transform) {
         withMathJax(
-          sprintf("$$y = %.03f\\left( {1 - {e^{\\left( { - %.03f{\\log x^{%.03f}}} \\right)}}} \\right)$$", d, z, f)
+          sprintf("$$y = %.03f\\left( {1 - {e^{\\left( { - %.03f{\\left( \\log x \\right)^{%.03f}}} \\right)}}} \\right)$$", d, z, f)
         )
       } else {
         withMathJax(
