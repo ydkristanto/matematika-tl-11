@@ -44,7 +44,7 @@ p <- harga_rumah %>%
   geom_smooth(
     method = "lm",
     formula = y ~ poly(x, 3),
-    alpha = .1,
+    alpha = .2,
     color = "#4EA6DC"
   ) +
   geom_point(
@@ -65,7 +65,7 @@ p <- harga_rumah %>%
   )
 
 ggsave(
-  filename = "harga_rumah.png",
+  filename = "plot/harga_rumah.svg",
   plot = p,
   width = 12,
   height = 6,
@@ -125,9 +125,9 @@ p1 <- PoU %>%
   scale_y_continuous(labels = scales::label_percent(scale = 1)) +
   theme_minimal(base_size = 6) + 
   labs(
-    title = "Prevalensi Ketidakcukupan\nKonsumsi Pangan",
     x = "Tahun",
-    y = "Proporsi"
+    y = "Proporsi",
+    caption = "Data: Badan Pusat Statistik, Susenas"
   )
 
 PoU_ID <- filter(PoU, provinsi == "Indonesia")
@@ -137,7 +137,7 @@ model_ID <- lm(
 )
 
 ggsave(
-  filename = "prev_pangan.png",
+  filename = "plot/prev_pangan.png",
   plot = p1,
   width = 9.6,
   height = 4.8,
@@ -177,14 +177,13 @@ p2 <- produksi_padi %>%
   scale_x_continuous(breaks = seq(2018, 2022, 2), limits = c(2017, 2023)) + 
   theme_minimal(base_size = 6) + 
   labs(
-    title = "Produksi Gabah",
     x = "Waktu",
     y = "Produksi\n(Juta Ton)",
     caption = "Data: Badan Pusat Statistik, Susenas"
   )
 
 ggsave(
-  filename = "produksi_gabah.png",
+  filename = "plot/produksi_gabah.png",
   plot = p2,
   width = 9.6,
   height = 4.8,
@@ -201,6 +200,61 @@ ggsave(
   height = 6,
   units = "cm",
   dpi = 300
+)
+
+# Pengunjung Borobudur ----
+pengunjung_borobudur <- read_excel("data/pengunjung_borobudur.xlsx")
+pengunjung_borobudur <- pengunjung_borobudur %>% 
+  pivot_longer(
+    cols = c(-turis, -bulan),
+    names_to = "tahun",
+    values_to = "banyak_pengunjung"
+  ) %>% 
+  mutate(
+    tanggal_bawah = as.Date(paste(tahun, bulan, "01", sep = "-")),
+    tahun = as.numeric(tahun)
+  )
+
+rrt_bulanan <- pengunjung_borobudur %>% 
+  group_by(turis, bulan) %>% 
+  summarise(rerata_pengunjung = mean(banyak_pengunjung), .groups = "drop")
+data_bulanan <- rrt_bulanan %>% 
+  filter(turis == "Mancanegara")
+model <- lm(
+  formula = rerata_pengunjung ~ poly(bulan, degree = 3, raw = TRUE),
+  data = data_bulanan
+)
+coefficients(model)
+
+p_borobudur <- data_bulanan %>% 
+  ggplot(aes(x = bulan, y = rerata_pengunjung)) + 
+  geom_point(
+    size = 1.5,
+    color = "#E32D91"
+  ) + 
+  geom_smooth(
+    method = "lm",
+    formula = y ~ poly(x, degree = 3),
+    color = "#4EA6DC",
+    alpha = .15,
+    linewidth = 1.25
+  ) + 
+  scale_x_continuous(breaks = seq(1:12)) + 
+  theme_minimal(base_size = 9) + 
+  labs(
+    x = "Bulan",
+    y = "Rerata Banyaknya\nTuris Mancanegara",
+    caption = "Data: BPS Kabupaten Magelang"
+  )
+
+ggsave(
+  filename = "plot/pengunjung_borobudur.svg",
+  plot = p_borobudur,
+  width = 9.6,
+  height = 5.4,
+  units = "cm",
+  dpi = 300,
+  bg = "white"
 )
 
 # Pontianak dan Quito ----
