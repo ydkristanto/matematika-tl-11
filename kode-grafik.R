@@ -243,12 +243,12 @@ p_borobudur <- data_bulanan %>%
   theme_minimal(base_size = 9) + 
   labs(
     x = "Bulan",
-    y = "Rerata Banyaknya\nTuris Mancanegara",
+    y = "Rerata Banyaknya\nWisatawan Mancanegara",
     caption = "Data: BPS Kabupaten Magelang"
   )
 
 ggsave(
-  filename = "plot/pengunjung_borobudur.svg",
+  filename = "plot/pengunjung_borobudur.png",
   plot = p_borobudur,
   width = 9.6,
   height = 5.4,
@@ -319,6 +319,7 @@ basemap(limits = c(95, 141, -11, 6)) +
   )
 
 # Denpasar dan Perth ----
+load("data/sun_data.RData")
 data <- sun_data %>% 
   select(city, date, day_length) %>% 
   filter(
@@ -365,9 +366,84 @@ data %>%
   labs(
     title = "Perbandingan Lamanya Hari di Kota Denpasar dan Perth"
   )
+# Denpasar
+data %>% 
+  filter(Kota == "Denpasar") %>% 
+  ggplot(aes(x = month, y = `Lama hari (jam)`)) +
+  geom_point(
+    color = "#E32D91"
+  ) + 
+  scale_x_date(
+    labels = scales::date_format("%b %Y", locale = "id"),
+    breaks = "2 month"
+  ) + 
+  scale_y_continuous(
+    labels = scales::label_number(big.mark = ".", decimal.mark = ",")
+  ) +
+  theme_minimal(base_size = 5) + 
+  theme(
+    legend.position = "bottom",
+    # plot.title = element_text(face = "bold", hjust = .5),
+    plot.background = element_rect(fill = "white"),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.title.x = element_blank()
+  )
+# Perth
+data %>% 
+  filter(Kota == "Perth") %>% 
+  ggplot(aes(x = month, y = `Lama hari (jam)`)) +
+  geom_point(
+    color = "#4EA6DC"
+  ) + 
+  scale_x_date(
+    labels = scales::date_format("%b %Y", locale = "id"),
+    breaks = "2 month"
+  ) + 
+  scale_y_continuous(
+    labels = scales::label_number(big.mark = ".", decimal.mark = ",")
+  ) +
+  theme_minimal(base_size = 5) + 
+  theme(
+    legend.position = "bottom",
+    # plot.title = element_text(face = "bold", hjust = .5),
+    plot.background = element_rect(fill = "white"),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.title.x = element_blank()
+  )
+
+# Denpasar dan Perth
+ggplot(
+  data = data.frame(x = 0:25),
+  aes(x = x)
+) + 
+  geom_function(
+    aes(color = "Perth"),
+    fun = function(x) 0.49 * cos(0.52 * x) + 12.12,
+    xlim = c(1, 24)
+  ) + 
+  geom_function(
+    aes(color = "Denpasar"),
+    fun = function(x) 2.02 * cos(0.52 * x) + 12.14,
+    xlim = c(1, 24)
+  ) + 
+  scale_color_manual(
+    name = "Kota",
+    values = c(
+      "Denpasar" = "#E32D91",
+      "Perth" = "#4EA6DC"
+    )
+  ) + 
+  theme_minimal(base_size = 5) + 
+  theme(
+    legend.position = "top"
+  ) + 
+  labs(
+    x = "Bulan (mulai Januari 2023)",
+    y = "Lama hari (jam)"
+  )
 
 ggsave(
-  filename = "denpasar-perth.png",
+  filename = "plot/denpasar-perth.svg",
   plot = last_plot(),
   width = 9.6,
   height = 5.4,
