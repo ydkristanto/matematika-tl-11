@@ -22,6 +22,15 @@ data_usia_musik_rapi <- data_usia_musik %>%
   drop_na() %>%   # Hilangkan NA di tahun_lahir
   filter(rating <= 11)
 
+data_usia_musik_rapi |> 
+  group_by(tahun_rilis) |> 
+  summarise(
+    rerata_rating = mean(rating, na.rm = TRUE),
+    .groups = "drop"
+  ) |> 
+  arrange(-rerata_rating) |> 
+  head(20)
+
 n_usia_lagu <- data_usia_musik_rapi %>% 
   group_by(usia_lagu) %>% 
   summarise(n = n(), .groups = "drop")

@@ -3,6 +3,7 @@ library(bslib)
 library(tidyr)
 library(dplyr)
 library(purrr)
+library(forcats)
 library(plotly)
 library(scales)
 library(broom)
@@ -32,8 +33,6 @@ ui <- page_navbar(
   id = "model_polinomial",
   ## Sidebar ----
   sidebar = sidebar(
-    ### Gambar fitur ----
-    htmlOutput("gambar_fitur"),
     ### Data ----
     selectInput(
       "data",
@@ -116,42 +115,97 @@ ui <- page_navbar(
         nav_panel(
           title = "Tentang",
           markdown(
-            "Aplikasi berbasis web ini bertujuan untuk memodelkan hubungan antara banyaknya spesies tumbuhan berkayu dan luas wilayah (*species–area relationship*, SAR) di Kepulauan Raja Ampat. Melalui aplikasi ini, Anda dapat menggunakan model-model matematis yang beragam, seperti model linear, eksponensial, dan logistik. Selain itu, Anda juga dapat membandingkan model-model tersebut untuk mendapatkan model yang paling baik.
+            "Dasbor Shiny ini bertujuan untuk menggunakan fungsi polinomial untuk mengeksplorasi dan memodelkan data di sektor pangan (prevalensi ketidakcukupan konsumsi pangan dan produksi gabah), pariwisata (wisatawan Candi Borobudur), ekonomi (harga per unit pembangunan rumah), dan musik.
 
 Bagi pendidik, aplikasi ini dapat digunakan untuk memfasilitasi peserta didik bermatematika. Misalnya, permasalahan berikut dapat diajukan kepada peserta didik.
 
-> Model manakah yang menurutmu paling baik? Bagaimana strategimu dalam membandingkan model-model tersebut?
+> Untuk data Preferensi Musik, misalnya, fungsi polinomial berderajat berapakah yang paling efektif dan efisien untuk memodelkan `Rerata Rating` terhadap `Usia Lagu`? Mengapa?
 
-Dalam menjawab permasalahan tersebut, peserta didik dapat berdiskusi dengan teman-temannya dalam kelompok. Untuk melakukannya, mereka dapat mengamati diagram pencar (dan modelnya) atau tabel yang disediakan. Diagram pencar tersebut dapat dilihat pada tab Plot sedangkan tabelnya dapat dilihat pada tab Data dalam laman Eksplorasi.
-
-Diagram pencar tersebut memperlihatkan hubungan antara luas wilayah dan banyaknya spesies tumbuhan berkayu. Tampilannya tergantung dari tingkat analisis yang dipilih, yaitu pulau, transek, dan subtransek. Ketika pulau yang dipilih, variabel `Banyak Spesies` menyatakan total banyaknya spesies tumbuhan berkayu dalam pulau tersebut. Ketika transek yang dipilih, variabel tersebut menyatakan rata-rata banyaknya spesies di setiap transek dalam sebuah pulau. Hal ini juga sama ketika subtransek yang terpilih.
-
-Tabel dalam tab Data memperlihatkan detail data yang ditampilkan pada diagram pencar. Data dalam tabel tersebut terdiri dari lima variabel, yaitu `ID Pulau`, `Luas` (atau transformasinya, yaitu `log(Luas)`), `Banyak Spesies`, `Banyak Spesies (Pred. Model)`, dan `Galat`. Tiga variabel pertama cukup jelas. Variabel `Banyak Spesies (Pred. Model)` menyatakan (rata-rata) banyaknya spesies yang diperoleh dengan menginputkan `Luas` ke dalam model yang dihasilkan. Variabel `Galat` merupakan selisih antara `Banyak Spesies` dan `Banyak Spesies (Pred. Model)`."
+Dalam menjawab permasalahan tersebut, peserta didik dapat berdiskusi dengan teman-temannya dalam kelompok. Untuk melakukannya, mereka dapat mengamati diagram pencar (dan modelnya) atau tabel yang disediakan. Diagram pencar tersebut dapat dilihat pada tab Plot sedangkan tabelnya dapat dilihat pada tab Data dalam laman Eksplorasi."
           )
         ),
         nav_panel(
           #### Alat ----
           title = "Alat",
-          p("Aplikasi ini dikembangkan dengan menggunakan bahasa pemrograman", a("R", href = "https://www.R-project.org/", target = "_blank"), "dan paket", a("Shiny.", href = "https://CRAN.R-project.org/package=shiny", target = "_blank"), "Paket", a("shinylive", href = "https://posit-dev.github.io/r-shinylive/", target = "_blank"), "digunakan untuk mengekspor aplikasi ini agar dapat dijalankan di peramban web tanpa peladen R yang terpisah. Tata letak dasbor ini diatur dengan menggunakan ", a("bslib.", href = "https://CRAN.R-project.org/package=bslib", target = "_blank"), " Visualisasi datanya menggunakan ", a("ggplot2", href = "https://ggplot2.tidyverse.org", target = "_blank"), " dan ", a("plotly.", href = "https://plotly-r.com", target = "_blank"))
+          markdown(
+            "Aplikasi ini dikembangkan dengan menggunakan bahasa pemrograman [R](https://www.R-project.org/) dan paket [Shiny.](https://CRAN.R-project.org/package=shiny) Paket [shinylive](https://CRAN.R-project.org/package=shinylive) digunakan untuk mengekspor aplikasi ini agar dapat dijalankan di peramban web tanpa peladen R yang terpisah. Selain itu, aplikasi ini juga menggunakan paket [bslib,](https://CRAN.R-project.org/package=bslib) [tidyr,](https://CRAN.R-project.org/package=tidyr) [dplyr,](https://CRAN.R-project.org/package=dplyr) [purrr,](https://CRAN.R-project.org/package=purrr) [broom,](https://CRAN.R-project.org/package=broom) [ggplot2,](https://ggplot2.tidyverse.org) [forcats,](https://CRAN.R-project.org/package=forcats) [plotly,](https://plotly-r.com) dan [scales.](https://CRAN.R-project.org/package=scales)"
+          )
         ),
         nav_panel(
           #### Pengembang ----
           title = "Pengembang",
-          p("Pengembang dan pemelihara aplikasi ini adalah", a("Yosep Dwi Kristanto,", href = "https://people.usd.ac.id/~ydkristanto/", target = "_blank"), "seorang dosen dan peneliti di program studi", a("Pendidikan Matematika,", href = "https://usd.ac.id/s1pmat", target = "_blank"), a("Universitas Sanata Dharma,", href = "https://www.usd.ac.id/", target = "_blank"), "Yogyakarta.")
+          markdown(
+            "Pengembang dan pemelihara aplikasi ini adalah [Yosep Dwi Kristanto](https://people.usd.ac.id/~ydkristanto), seorang dosen dan peneliti di program studi [Pendidikan Matematika,](https://usd.ac.id/s1pmat) [Universitas Sanata Dharma,](https://www.usd.ac.id/) Yogyakarta."
+          )
         ),
         nav_panel(
           #### Kode Sumber ----
           title = "Kode Sumber",
-          p("Kode sumber aplikasi ini tersedia di", a("repositori Github.", href = "https://github.com/ydkristanto/matematika-tl-11", target = "_blank"), "Jika Anda ingin melaporkan masalah atau meminta fitur tambahan terhadap aplikasi ini, silakan", a("buat sebuah isu", href = "https://github.com/ydkristanto/matematika-tl-11/issues", target = "_blank"), "atau lebih baik lagi", a("minta penarikan", href = "https://github.com/ydkristanto/matematika-tl-11/pulls", target = "_blank"), "di repositori tersebut.")
+          markdown(
+            "Kode sumber aplikasi ini tersedia di repositori [Github.](https://github.com/ydkristanto/matematika-tl-11) Jika Anda ingin melaporkan masalah atau meminta fitur tambahan terhadap aplikasi ini, silakan [buat sebuah isu](https://github.com/ydkristanto/matematika-tl-11/issues) atau lebih baik lagi [minta penarikan](https://github.com/ydkristanto/matematika-tl-11/pulls) di repositori tersebut."
+          )
         )
       ),
       #### Data ----
-      card(
-        card_header(
-          "Data"
+      navset_card_underline(
+        title = "Data",
+        nav_panel(
+          title = "Pangan",
+          markdown(
+            "Data sektor pangan yang digunakan dalam dasbor ini adalah [data prevalensi ketidakcukupan konsumsi pangan](https://www.bps.go.id/id/statistics-table/2/MTQ3MyMy/prevalensi-ketidakcukupan-konsumsi-pangan--persen-.html) dan [data produksi gabah,](https://www.bps.go.id/id/statistics-table/2/MTQ5OCMy/luas-panen--produksi--dan-produktivitas-padi-menurut-provinsi.html) yang keduanya diperoleh dari BPS. Prevalensi ketidakcukupan konsumsi pangan (*Prevalence of Undernourishment*, PoU) merupakan kondisi saat suatu populasi tertentu mengkonsumsi jumlah makanan yang tidak cukup untuk memenuhi energi yang dibutuhkan untuk hidup normal, aktif, dan sehat.
+            
+            Pada periode 2017–2023, rata-rata PoU provinsi-provinsi di Indonesia disajikan seperti berikut."
+          ),
+          div(
+            plotOutput("ringkasan_pou"),
+            style = "height:390px;"
+          ),
+          markdown(
+            "Rata-rata produksi gabah provinsi-provinsi di Indonesia pada periode 2018–2023 ditunjukkan seperti berikut."
+          ),
+          div(
+            plotOutput("ringkasan_gabah"),
+            style = "height:390px;"
+          )
         ),
-        card_body(
+        nav_panel(
+          title = "Pariwisata",
+          markdown(
+          "Data sektor pariwisata yang digunakan dalam dasbor ini merupakan data [jumlah pengunjung obyek wisata Candi Borobudur](https://magelangkab.bps.go.id/indicator/16/327/1/pengunjung-candi-borobudur.html) pada periode 2008–2022. Data tersebut diperoleh dari BPS Kabupaten Magelang.
           
+          Berdasarkan asal wisatawannya, jumlah pengunjung obyek pariwisata tersebut setiap bulannya disajikan sebagai berikut."
+          ),
+          div(
+            plotOutput("ringkasan_borobudur"),
+            style = "height:200px;"
+          )
+        ),
+        nav_panel(
+          title = "Ekonomi",
+          markdown(
+            "Untuk sektor ekonomi, dasbor ini menggunakan [data rerata harga per unit pembangunan rumah oleh perum perumnas untuk provinsi-provinsi di Indonesia](https://www.bps.go.id/id/statistics-table/2/MjU2IzI=/rata-rata-harga-unit-pembangunan-rumah-oleh-perum-perumnas.html) yang periode maksimumnya adalah 2008–2018. Data ini diperoleh dari BPS.
+            
+            Rerata harga per unit untuk provinsi-provinsi tersebut disajikan sebagai berikut."
+          ),
+          div(
+            plotOutput("ringkasan_rumah"),
+            style = "height:390px;"
+          )
+        ),
+        nav_panel(
+          title = "Musik",
+          markdown(
+            "Data musik yang digunakan dalam dasbor ini bersumber dari Davies dkk. ([2022](https://doi.org/10.1007/s11002-022-09626-7)). Berdasarkan artikel yang mereka publikasikan di [*Marketing Letters*](https://link.springer.com/journal/11002), mereka mensurvei 1036 responden yang semuanya merupakan warga Amerika Serikat dengan rerata usia 48,6 tahun (SD = 17,6) dan 53% perempuan. Responden-responden tersebut diminta untuk memberikan rating terhadap [beberapa lagu hits yang diberikan.](https://link.springer.com/article/10.1007/s11002-022-09626-7/tables/2) Lagu-lagu tersebut antara lain [Stayin’ Alive (Bee Gees),](https://open.spotify.com/track/5ubvP9oKmxLUVq506fgLhk?si=a1d2166d657240ac) [Lean on Me (Bill Withers),](https://open.spotify.com/track/5zCJvrT3C7cIfHsR5iG95l?si=0541628dea324579) dan [I Get Around (Beach Boys).](https://open.spotify.com/track/3mXexrmtPJ1KdWN37rYePx?si=cb906fdeeb594278) Rating tersebut merentang dari 0 (sangat tidak suka) sampai 10 (sangat suka).
+            
+            Sebagai gambaran umum, berikut ini rerata rating 10 lagu yang memiliki rerata rating tertinggi berdasarkan survei tersebut."
+          ),
+          div(
+            plotOutput("ringkasan_lagu"),
+            style = "height:390px;"
+          ),
+          markdown(
+            "Data tersebut digunakan untuk mengetahui bagaimana hubungan usia lagu terhadap rerata ratingnya. Usia lagu ini merupakan hasil pengurangan tahun rilis sebuah lagu dengan tahun lahir responden. Misalnya, jika seorang responden lahir pada tahun 1985 memberikan rating terhadap lagu yang rilis pada tahun 2002, usia lagunya adalah 17."
+          )
         )
       )
     )
@@ -174,7 +228,6 @@ Tabel dalam tab Data memperlihatkan detail data yang ditampilkan pada diagram pe
 
 # Peladen ----
 server <- function(input, output, session) {
-  
   ## Input wilayah ----
   # Daftar provinsi
   prov_gabah <- data_gabah$wilayah |>
@@ -516,7 +569,7 @@ server <- function(input, output, session) {
           theme(legend.title = element_text(hjust = .5)),
           labs(
             x = "Tahun",
-            y = "Prevalensi Ketidakcukupan\nKonsumsi Pangan"
+            y = "Prevalensi Ketidakcukupan\nKonsumsi Pangan (PoU)"
           )
         )
     } else if (input$data == "rumah") {
@@ -541,7 +594,7 @@ server <- function(input, output, session) {
           theme_minimal(),
           labs(
             x = "Tahun",
-            y = "Harga Unit Perumahan"
+            y = "Rerata Harga/Unit\n(Juta Rupiah)"
           )
         )
     }
@@ -652,7 +705,7 @@ server <- function(input, output, session) {
           ),
           theme_minimal(),
           labs(
-            x = "Harga Unit Perumahan (Pred. Model)",
+            x = "Rerata Harga/Unit (Juta Rupiah) (Pred. Model)",
             y = "Galat"
           )
         )
@@ -666,10 +719,245 @@ server <- function(input, output, session) {
     striped = TRUE,
     hover = TRUE,
     width = "100%",{
-    data_model() |> 
+    data <- data_model() |> 
         rename(
-          galat = residu
+          Galat = residu
         )
+    if(input$data == "borobudur") {
+      tabel <- data |> 
+        rename(
+          Wisatawan = wisatawan,
+          Bulan = bulan,
+          `Rerata Banyak Wisatawan` = rerata,
+          `Pred. Model` = pred
+        )
+    } else if(input$data == "gabah") {
+      tabel <- data |> 
+        rename(
+          Wilayah = wilayah,
+          Tahun = tahun,
+          `Produksi Gabah (Ton)` = produksi_ton,
+          `Pred. Model` = pred
+        )
+    } else if(input$data == "pangan") {
+      tabel <- data |> 
+        rename(
+          Wilayah = wilayah,
+          Tahun = tahun,
+          `PoU (%)` = pou,
+          `Pred. Model` = pred
+        )
+    } else if(input$data == "rumah") {
+      tabel <- data |> 
+        rename(
+          Wilayah = wilayah,
+          Tahun = tahun,
+          `Rerata Harga/Unit (Juta Rupiah)` = harga,
+          `Pred. Model` = pred
+        )
+    } else if(input$data == "musik") {
+      tabel <- data |> 
+        select(-frekuensi) |> 
+        mutate(usia_lagu = as.integer(round(usia_lagu))) |> 
+        rename(
+          `Usia Lagu` = usia_lagu,
+          `Rerata Rating` = rerata_rating,
+          `Pred. Model` = pred
+        )
+    }
+    
+    tabel
+    
+  })
+  
+  ## Ringkasan PoU ----
+  output$ringkasan_pou <- renderPlot({
+    pou_idn <- data_pangan |> 
+      filter(wilayah == "Indonesia")
+    rerata_pou_idn <- mean(pou_idn$pou)
+    plot <- data_pangan |> 
+      filter(wilayah != "Indonesia") |> 
+      group_by(wilayah) |> 
+      summarise(
+        rerata_pou = mean(pou), .groups = "drop"
+      ) |> 
+      mutate(wilayah = fct_reorder(wilayah, rerata_pou)) |> 
+      ggplot(aes(x = rerata_pou, y = wilayah)) + 
+      geom_vline(xintercept = rerata_pou_idn, linetype = "dashed") + 
+      geom_point(aes(color = rerata_pou), show.legend = FALSE, size = 2) + 
+      geom_label(
+        x = rerata_pou_idn - 1.25, y = 4,
+        label = "Indonesia",
+        angle = 90
+      ) + 
+      scale_x_continuous(labels = scales::label_percent(scale = 1)) + 
+      scale_color_viridis_b() + 
+      theme_minimal() + 
+      theme(axis.title.y = element_blank()) + 
+      labs(x = "Rerata PoU")
+    plot
+    
+  })
+  
+  ## Ringkasan produksi gabah ----
+  output$ringkasan_gabah <- renderPlot({
+    plot <- data_gabah |> 
+      filter(wilayah != "Indonesia") |> 
+      drop_na() |> 
+      group_by(wilayah) |> 
+      summarise(
+        rerata_produksi = mean(produksi_ton, na.rm = TRUE),
+        .groups = "drop"
+      ) |> 
+      mutate(
+        wilayah = fct_reorder(wilayah, rerata_produksi)
+      ) |> 
+      ggplot(aes(x = rerata_produksi, y = wilayah)) + 
+      geom_point(
+        aes(color = rerata_produksi),
+        size = 2,
+        show.legend = FALSE
+      )+ 
+      scale_color_viridis_b() + 
+      theme_minimal() + 
+      theme(axis.title.y = element_blank()) + 
+      labs(x = "Rerata Produksi Gabah (Ton)")
+    
+    plot
+    
+  })
+  
+  ## Ringkasan wisatawan Borobudur ----
+  output$ringkasan_borobudur <- renderPlot({
+    plot <- data_borobudur |> 
+      ggplot(aes(x = tanggal_bawah, y = frekuensi)) + 
+      geom_line(
+        aes(group = wisatawan, color = wisatawan),
+        show.legend = FALSE
+      ) + 
+      geom_point(aes(color = wisatawan), show.legend = FALSE) + 
+      facet_wrap(vars(wisatawan), scales = "free_y", ncol = 1) + 
+      scale_color_viridis_d() + 
+      theme_minimal() + 
+      labs(
+        x = "Waktu",
+        y = "Banyak Wisatawan"
+      )
+    
+    plot
+  })
+  
+  ## Ringkasan harga rumah ----
+  output$ringkasan_rumah <- renderPlot({
+    harga_rmh_idn <- data_rumah |> 
+      filter(wilayah == "Indonesia")
+    rerata_harga_rmh_idn <- harga_rmh_idn$harga |> 
+      mean()
+    plot <- data_rumah |> 
+      filter(wilayah != "Indonesia") |> 
+      drop_na() |> 
+      group_by(wilayah) |> 
+      summarise(
+        rerata_harga = mean(harga, na.rm = TRUE),
+        .groups = "drop"
+      ) |> 
+      mutate(
+        wilayah = fct_reorder(wilayah, rerata_harga)
+      ) |> 
+      ggplot(aes(x = rerata_harga, y = wilayah)) + 
+      geom_point(
+        aes(color = rerata_harga),
+        size = 2,
+        show.legend = FALSE
+      ) + 
+      scale_color_viridis_b() + 
+      theme_minimal() + 
+      theme(axis.title.y = element_blank()) + 
+      labs(x = "Rerata Harga per Unit (Juta Rupiah)")
+    
+    plot
+    
+  })
+  
+  ## Ringkasan lagu teratas ----
+  output$ringkasan_lagu <- renderPlot({
+    daftar_lagu <- tribble(
+      ~tahun_rilis, ~judul, ~penampil,
+      1950, "Play a Simple Melody", "Bing and Gary Crosby",
+      1952, "You Belong to Me", "Jo Stafford",
+      1954, "Sh Boom Sh Boom", "The Crew Cuts",
+      1956, "My Prayer", "The Platters",
+      1958, "Patricia", "Perez Prado",
+      1960, "Running Bear", "Johnny Preston",
+      1962, "Roses are Red", "Bobby Vinton",
+      1964, "I Get Around", "Beach Boys",
+      1966, "The Last Train to Clarksville", "The Monkees",
+      1968, "People Got to be Free", "The Rascals",
+      1970, "Raindrops Keep Fallin’ on My Head", "B.J. Thomas",
+      1972, "Lean on Me", "Bill Withers",
+      1974, "The Sound of Philadelphia", "MFSB ft. Three Degrees",
+      1976, "Play that Funky Music", "Wild Cherry",
+      1978, "Stayin’ Alive", "Bee Gees",
+      1980, "Crazy Little Thing Called Love", "Queen",
+      1982, "Don’t You Want Me", "Human League",
+      1984, "Footloose", "Kenny Loggins",
+      1986, "Party All the Time", "Eddie Murphy",
+      1988, "Sweet Child O’ Mine", "Guns N’ Roses",
+      1990, "Vogue", "Madonna",
+      1992, "Under the Bridge", "Red Hot Chilli Peppers",
+      1994, "All She Wants", "Ace of Base",
+      1996, "Missing", "Everything but the Girl",
+      1998, "Crush", "Jennifer Paige",
+      2000, "Say My Name", "Destiny’s Child",
+      2002, "Dilemma", "Nelly ft. Kelly Rowland",
+      2004, "Hey Ya", "OutKast",
+      2006, "Sexy Back", "Justin Timberlake",
+      2008, "Lollipop", "Lil Wayne",
+      2010, "California Gurls", "Katy Perry",
+      2012, "Payphone", "Maroon 5",
+      2014, "Counting Stars", "One Republic",
+      2016, "Work", "Rihanna"
+    ) |> 
+      mutate(
+        tahun_rilis = as.integer(tahun_rilis)
+      )
+    
+    lagu_teratas <- tribble(
+      ~tahun_rilis, ~rerata_rating,
+      1978, 7.71,
+      1972, 7.42,
+      1964, 7.2,
+      1984, 6.86,
+      1988, 6.53,
+      1966, 6.48,
+      1970, 6.4,
+      1976, 6.37,
+      1992, 6.34,
+      1980, 6.29
+    ) |> 
+      arrange(tahun_rilis)
+    
+    daftar_lagu_teratas <- lagu_teratas |> 
+      left_join(daftar_lagu, by = join_by(tahun_rilis))
+    
+    daftar_lagu_teratas |> 
+      mutate(
+        judul = fct_reorder(judul, rerata_rating)
+      ) |> 
+      ggplot(aes(x = rerata_rating, y = judul)) + 
+      geom_point(
+        aes(color = rerata_rating),
+        size = 3,
+        show.legend = FALSE
+      ) + 
+      scale_y_discrete(labels = scales::label_wrap(20)) + 
+      scale_color_viridis_b() + 
+      theme_minimal(base_size = 12) + 
+      theme(axis.title.y = element_blank()) + 
+      labs(
+        x = "Rerata Rating"
+      )
+    
   })
   
 }
