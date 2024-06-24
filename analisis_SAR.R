@@ -175,7 +175,7 @@ data_model <- function(analisis = "pulau", transform = TRUE) {
 }
 
 ## Pilih data ----
-data_model(analisis = "transek", transform = TRUE)
+data_model(analisis = "pulau", transform = TRUE)
 
 ## Pemodelan ----
 
@@ -471,4 +471,6 @@ data_rss %>%
   labs(
     x = "Jumlah Kuadrat Galat"
   )
-
+data_rss |> 
+  filter(tingkat == "Subtransek") |> 
+  arrange(rss)

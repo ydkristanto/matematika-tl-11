@@ -45,7 +45,7 @@ p <- harga_rumah %>%
     method = "lm",
     formula = y ~ poly(x, 3),
     alpha = .2,
-    color = "#4EA6DC"
+    color = "#43ADA5"
   ) +
   geom_point(
     color = "#E32D91",
@@ -65,7 +65,7 @@ p <- harga_rumah %>%
   )
 
 ggsave(
-  filename = "plot/harga_rumah.svg",
+  filename = "plot/harga_rumah.png",
   plot = p,
   width = 12,
   height = 6,
@@ -112,18 +112,38 @@ p1 <- PoU %>%
   ggplot(aes(x = tahun, y = pou)) + 
   geom_point(
     size = 1,
-    color = "#E32D91",
-    alpha = .6
+    color = "#E32D91"
   ) + 
   geom_smooth(
     method = "lm",
     formula = y ~ poly(x, 4),
-    color = "#4EA6DC",
+    color = "#43ADA5",
     alpha = .1,
     linewidth = 1
   ) + 
   scale_y_continuous(labels = scales::label_percent(scale = 1)) +
   theme_minimal(base_size = 6) + 
+  labs(
+    title = "Prevalensi Ketidakcukupan\nKonsumsi Pangan",
+    x = "Tahun",
+    y = "Proporsi"
+  )
+p1_1 <- PoU %>% 
+  filter(provinsi == "Indonesia") %>% 
+  ggplot(aes(x = tahun, y = pou)) + 
+  geom_point(
+    size = 1,
+    color = "#E32D91"
+  ) + 
+  geom_smooth(
+    method = "lm",
+    formula = y ~ poly(x, 4),
+    color = "#43ADA5",
+    alpha = .1,
+    linewidth = 1
+  ) + 
+  scale_y_continuous(labels = scales::label_percent(scale = 1)) +
+  theme_minimal(base_size = 9) + 
   labs(
     x = "Tahun",
     y = "Proporsi",
@@ -137,8 +157,8 @@ model_ID <- lm(
 )
 
 ggsave(
-  filename = "plot/prev_pangan.png",
-  plot = p1,
+  filename = "plot/prev_pangan.svg",
+  plot = p1_1,
   width = 9.6,
   height = 4.8,
   units = "cm",
@@ -158,13 +178,12 @@ p2 <- produksi_padi %>%
   ggplot(aes(x = tahun, y = produksi_jtton)) + 
   geom_point(
     size = 1,
-    color = "#E32D91",
-    alpha = .6
+    color = "#E32D91"
   ) + 
   geom_smooth(
     method = "lm",
     formula = y ~ poly(x, 3),
-    color = "#4EA6DC",
+    color = "#43ADA5",
     alpha = .1,
     linewidth = 1
   ) + 
@@ -177,14 +196,45 @@ p2 <- produksi_padi %>%
   scale_x_continuous(breaks = seq(2018, 2022, 2), limits = c(2017, 2023)) + 
   theme_minimal(base_size = 6) + 
   labs(
-    x = "Waktu",
+    title = "Produksi Gabah",
+    x = "Tahun",
+    y = "Produksi\n(Juta Ton)",
+    caption = "Data: Badan Pusat Statistik, Susenas"
+  )
+
+p2_1 <- produksi_padi %>% 
+  filter(provinsi == "Indonesia") %>% 
+  mutate(tahun = as.numeric(tahun),
+         produksi_jtton = as.numeric(produksi_ton) / 10^6) %>% 
+  ggplot(aes(x = tahun, y = produksi_jtton)) + 
+  geom_point(
+    size = 1,
+    color = "#E32D91"
+  ) + 
+  geom_smooth(
+    method = "lm",
+    formula = y ~ poly(x, 3),
+    color = "#43ADA5",
+    alpha = .1,
+    linewidth = 1
+  ) + 
+  scale_y_continuous(
+    labels = scales::label_comma(
+      big.mark = ".",
+      decimal.mark = ","
+    )
+  ) + 
+  scale_x_continuous(breaks = seq(2018, 2022, 2), limits = c(2017, 2023)) + 
+  theme_minimal(base_size = 9) + 
+  labs(
+    x = "Tahun",
     y = "Produksi\n(Juta Ton)",
     caption = "Data: Badan Pusat Statistik, Susenas"
   )
 
 ggsave(
-  filename = "plot/produksi_gabah.png",
-  plot = p2,
+  filename = "plot/produksi_gabah.svg",
+  plot = p2_1,
   width = 9.6,
   height = 4.8,
   units = "cm",
@@ -235,7 +285,7 @@ p_borobudur <- data_bulanan %>%
   geom_smooth(
     method = "lm",
     formula = y ~ poly(x, degree = 3),
-    color = "#4EA6DC",
+    color = "#43ADA5",
     alpha = .15,
     linewidth = 1.25
   ) + 
@@ -248,7 +298,7 @@ p_borobudur <- data_bulanan %>%
   )
 
 ggsave(
-  filename = "plot/pengunjung_borobudur.png",
+  filename = "plot/pengunjung_borobudur.svg",
   plot = p_borobudur,
   width = 9.6,
   height = 5.4,
@@ -355,7 +405,10 @@ data %>%
   ) +
   ylim(0, 18) +
   scale_color_manual(
-    values = palet_warna
+    values = c(
+      "Denpasar" = "#E32D91",
+      "Perth" = "#43ADA5"
+    )
   ) +
   theme_minimal(base_size = 7) +
   theme(
@@ -443,7 +496,7 @@ ggplot(
   )
 
 ggsave(
-  filename = "plot/denpasar-perth.svg",
+  filename = "plot/denpasar-perth.png",
   plot = last_plot(),
   width = 9.6,
   height = 5.4,

@@ -14,6 +14,17 @@ student_desmos <- add_logo(
 plot(student_desmos)
 
 # Polinomial ----
+## Pemodelan Fungsi Polinomial ----
+ai_2_model_polinom <- add_logo(
+  qr_code(
+    "https://people.usd.ac.id/~ydkristanto/app/model-polinomial/",
+    ecl = "H"
+  ),
+  logo = "plot/logo-kemdikbud.svg",
+  ecl = "L"
+)
+plot(ai_2_model_polinom)
+
 ## Perilaku Ujung Polinomial ----
 ai_2_ujung_polinom <- add_logo(
   qr_code(
@@ -59,6 +70,16 @@ sb_2_faktor_polinom <- add_logo(
 plot(sb_2_faktor_polinom)
 
 # Fungsi Trigonometri ----
+## ATP Fungsi Trigonometri ----
+atp_3_fungsi_trig <- add_logo(
+  qr_code(
+    "https://kristantomath.com/2024/07/01/atp-fungsi-trigonometri/",
+    ecl = "H"
+  ),
+  logo = "plot/logo-kemdikbud.svg",
+  ecl = "L"
+)
+plot(atp_3_fungsi_trig)
 ## Derajat-Radian ----
 ai_3_derajat_rad <- add_logo(
   qr_code(
@@ -181,4 +202,13 @@ ai_6_jelajah_raja_ampat <- add_logo(
 )
 plot(ai_6_jelajah_raja_ampat)
 
-
+## Pembahasan Jelajah Kepulauan Raja Ampat ----
+ai_6_matematika_raja_ampat <- add_logo(
+  qr_code(
+    "https://kristantomath.com/2024/05/02/matematika-raja-ampat/",
+    ecl = "H"
+  ),
+  logo = "plot/logo-kemdikbud.svg",
+  ecl = "L"
+)
+plot(ai_6_matematika_raja_ampat)
