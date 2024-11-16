@@ -6,14 +6,24 @@ shinylive::export(
   subdir = "derajat-radian"
 )
 shinylive::export(
+  appdir = "apl-jelajah-raja-ampat",
+  destdir = "docs",
+  subdir = "jelajah-raja-ampat"
+)
+shinylive::export(
+  appdir = "apl-kalkulator-matahari",
+  destdir = "docs",
+  subdir = "kalkulator-matahari"
+)
+shinylive::export(
+  appdir = "apl-model-polinomial",
+  destdir = "docs",
+  subdir = "model-polinomial"
+)
+shinylive::export(
   appdir = "apl-simulasi-tabungan",
   destdir = "docs",
   subdir = "simulasi-tabungan"
-)
-shinylive::export(
-  appdir = "apl-plotly",
-  destdir = "docs",
-  subdir = "contoh-plotly"
 )
 
 # Menguji aplikasi dalam folder "docs".
